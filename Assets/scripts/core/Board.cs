@@ -8,7 +8,12 @@ public class Board : MonoBehaviour {
 	private int boardWidth, boardHeight;
 
 	private void Start () {
+		SetCameraPosition();
 		DrawEmptyCells();
+	}
+
+	private void SetCameraPosition () {
+		Camera.main.transform.position = new Vector3((float)(boardWidth - 1) / 2, (float)(boardHeight - 1) / 2, -10);
 	}
 
 	private void DrawEmptyCells () {

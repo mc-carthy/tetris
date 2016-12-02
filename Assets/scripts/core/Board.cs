@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 
 public class Board : MonoBehaviour {
 
@@ -6,6 +7,10 @@ public class Board : MonoBehaviour {
 	private Transform emptyCellPrefab;
 	[SerializeField]
 	private int boardWidth, boardHeight;
+
+	private void Awake () {
+		Assert.IsNotNull(emptyCellPrefab);
+	}
 
 	private void Start () {
 		SetCameraPosition();

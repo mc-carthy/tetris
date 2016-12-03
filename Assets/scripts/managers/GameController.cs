@@ -11,5 +11,7 @@ public class GameController : MonoBehaviour {
 		spawner = GameObject.FindWithTag("spawner").GetComponent<Spawner>();
 		Assert.IsNotNull(board);
 		Assert.IsNotNull(spawner);
+		
+		spawner.transform.position = Vectorf.Round(spawner.transform.position);
 	}
 }

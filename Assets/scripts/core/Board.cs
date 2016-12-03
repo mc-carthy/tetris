@@ -8,8 +8,11 @@ public class Board : MonoBehaviour {
 	[SerializeField]
 	private int boardWidth, boardHeight, header;
 
+	private Transform[,] grid;
+
 	private void Awake () {
 		Assert.IsNotNull(emptyCellPrefab);
+		grid = new Transform[boardWidth, boardHeight];
 	}
 
 	private void Start () {

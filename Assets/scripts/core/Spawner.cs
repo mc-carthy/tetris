@@ -1,16 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Spawner : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
+	[SerializeField]
+	private Shape[] shapePrefabs;
+
+	private Shape GetRandomShape () {
+		return shapePrefabs[Random.Range(0, shapePrefabs.Length)];
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+	public Shape SpawnShape () {
+		Shape newShape = Instantiate(GetRandomShape(), transform.position, Quaternion.identity) as Shape;
+		if (newShape) {
+			return newShape;
+		} else {
+			Debug.LogError("Error! Shape could not be spawned");
+			return null;
+		}
 	}
 }

@@ -73,5 +73,6 @@ public class GameController : MonoBehaviour {
 		activeShape.MoveUp();
 		board.StoreShapeInGrid(activeShape);
 		activeShape = spawner.SpawnShape();
+		board.ClearFullRows();
 	}
 }

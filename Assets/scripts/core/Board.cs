@@ -19,6 +19,41 @@ public class Board : MonoBehaviour {
 		DrawEmptyCells();
 	}
 
+	public bool IsValidPosition (Shape shape) {
+		foreach (Transform child in shape.transform) {
+			Vector2 pos = Vectorf.Round(child.position);
+
+			if (!IsWithinBoard((int)pos.x, (int)pos.y)) {
+				return false;
+			}
+			if (IsOccupied((int)pos.x, (int)pos.y, shape)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public void StoreShapeInGrid (Shape shape) {
+		if (shape == null) {
+			return;
+		}
+
+		foreach (Transform child in shape.transform) {
+			Vector2 pos = Vectorf.Round(child.position);
+			grid[(int)pos.x, (int)pos.y] = child;
+		}
+	}
+
+	public void ClearFullRows () {
+		for (int y = 0; y < boardHeight; ++y) {
+			if (IsCompleteRow(y)) {
+				ClearRow(y);
+				ShiftRowsDown(y + 1);
+				y--;
+			}
+		}
+	}
+
 	private void DrawEmptyCells () {
 		for (int y = 0; y < boardHeight - header; y++) {
 			for (int x = 0; x < boardWidth; x++) {
@@ -38,31 +73,37 @@ public class Board : MonoBehaviour {
 		return (grid[x, y] != null && grid[x, y].parent != shape.transform);
 	}
 
-	public bool IsValidPosition (Shape shape) {
-		foreach (Transform child in shape.transform) {
-			Vector2 pos = Vectorf.Round(child.position);
-
-			if (!IsWithinBoard((int)pos.x, (int)pos.y)) {
-				return false;
-			}
-			if (IsOccupied((int)pos.x, (int)pos.y, shape)) {
+	private bool IsCompleteRow (int y) {
+		for (int x = 0; x < boardWidth; x++) {
+			if (grid[x, y] == null) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	
-
-	public void StoreShapeInGrid (Shape shape) {
-		if (shape == null) {
-			return;
-		}
-
-		foreach (Transform child in shape.transform) {
-			Vector2 pos = Vectorf.Round(child.position);
-			grid[(int)pos.x, (int)pos.y] = child;
+	private void ClearRow (int y) {
+		for (int x = 0; x < boardWidth; x++) {
+			if (grid[x, y] != null) {
+				Destroy(grid[x, y].gameObject);
+				grid[x, y] = null;
+			}
 		}
 	}
 
+	private void ShiftOneRowDown (int y) {
+		for (int x = 0; x < boardWidth; x++) {
+			if (grid[x, y] != null) {
+				grid[x, y - 1] = grid[x, y];
+				grid[x, y - 1].position += new Vector3(0, -1, 0);
+				grid[x, y] = null;
+			}
+		}
+	}
+
+	private void ShiftRowsDown (int StartY) {
+		for (int y = StartY; y < boardHeight; y++) {
+			ShiftOneRowDown(y);
+		}
+	}
 }

@@ -3,6 +3,22 @@
 public class SoundManager : MonoBehaviour {
 
 	[SerializeField]
+	private IconToggle musicIconToggle;
+	public IconToggle MusicIconToggle {
+		get {
+			return musicIconToggle;
+		}
+	}
+
+	[SerializeField]
+	private IconToggle sfxIconToggle;
+	public IconToggle SfxIconToggle {
+		get {
+			return sfxIconToggle;
+		}
+	}
+
+	[SerializeField]
 	private AudioClip[] vocalClips;
 	public AudioClip[] VocalClips {
 		get {
@@ -110,11 +126,17 @@ public class SoundManager : MonoBehaviour {
 
 	public void ToggleMusic () {
 		isMusicEnabled = !isMusicEnabled;
+		if (musicIconToggle) {
+			musicIconToggle.ToggleIcon(isMusicEnabled);
+		}
 		UpdateMusic();
 	}
 
 	public void ToggleSfx () {
 		isSfxEnabled = !isSfxEnabled;
+		if (sfxIconToggle) {
+			sfxIconToggle.ToggleIcon(isSfxEnabled);
+		}
 	}
 
 	public AudioClip GetRandomClip (AudioClip[] clips) {

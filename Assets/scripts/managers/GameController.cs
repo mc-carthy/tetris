@@ -13,8 +13,6 @@ public class GameController : MonoBehaviour {
 	private bool isGameOver;
 	private float timeToDrop;
 	private float dropInterval = 0.5f;
-	private float timeToNextKey;
-	private float keyRepeatRate = 0.1f;
 	private float timeToNextKeyLeftRight;
 	private float keyRepeatRateLeftRight = 0.1f;
 	private float timeToNextKeyDown;
@@ -104,6 +102,9 @@ public class GameController : MonoBehaviour {
 		PlaySfxThroughGameController(soundManager.DropSound, 0.25f);
 
 		if (board.CompletedRows > 0) {
+			if (board.CompletedRows > 1) {
+				PlaySfxThroughGameController(soundManager.GetRandomClip(soundManager.VocalClips));
+			}
 			PlaySfxThroughGameController(soundManager.ClearRowSound);
 		}
 	}

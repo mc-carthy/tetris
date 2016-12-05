@@ -3,6 +3,14 @@
 public class SoundManager : MonoBehaviour {
 
 	[SerializeField]
+	private AudioClip[] vocalClips;
+	public AudioClip[] VocalClips {
+		get {
+			return vocalClips;
+		}
+	}
+
+	[SerializeField]
 	private AudioClip clearRowSound;
 	public AudioClip ClearRowSound {
 		get {
@@ -93,7 +101,7 @@ public class SoundManager : MonoBehaviour {
 		isSfxEnabled = !isSfxEnabled;
 	}
 
-	private AudioClip GetRandomClip (AudioClip[] clips) {
+	public AudioClip GetRandomClip (AudioClip[] clips) {
 		AudioClip randomClip = clips[Random.Range(0, clips.Length)];
 		return randomClip;
 	}

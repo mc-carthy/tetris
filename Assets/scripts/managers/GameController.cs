@@ -51,11 +51,12 @@ public class GameController : MonoBehaviour {
 
 	private void GetPlayerInput () {
 		if (Input.GetButton("MoveRight") && Time.time > timeToNextKeyLeftRight || Input.GetButtonDown("MoveRight")) {
-			PlaySfxThroughGameController(soundManager.MoveSound);
 			activeShape.MoveRight();
 			timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
 			if (!board.IsValidPosition(activeShape)) {
 				activeShape.MoveLeft();
+			} else {
+				PlaySfxThroughGameController(soundManager.MoveSound);
 			}
 		} else if (Input.GetButton("MoveLeft") && Time.time > timeToNextKeyLeftRight || Input.GetButtonDown("MoveLeft")) {
 			PlaySfxThroughGameController(soundManager.MoveSound);
@@ -63,13 +64,16 @@ public class GameController : MonoBehaviour {
 			timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
 			if (!board.IsValidPosition(activeShape)) {
 				activeShape.MoveRight();
+			} else {
+				PlaySfxThroughGameController(soundManager.MoveSound);
 			}
 		} else if (Input.GetButtonDown("Rotate")) { //&& Time.time > timeToNextKeyRotate) {
-			PlaySfxThroughGameController(soundManager.MoveSound);
 			activeShape.RotateRight();
 			//timeToNextKeyRotate = Time.time + keyRepeatRateRotate;
 			if (!board.IsValidPosition(activeShape)) {
 				activeShape.RotateLeft();
+			} else {
+				PlaySfxThroughGameController(soundManager.MoveSound);
 			}
 		}
 		if (Input.GetButton("MoveDown") && Time.time > timeToNextKeyDown || Time.time > timeToDrop) {
@@ -105,9 +109,9 @@ public class GameController : MonoBehaviour {
 		PlaySfxThroughGameController(soundManager.GameOverSound);
 	}
 
-	private void PlaySfxThroughGameController (AudioClip clip) {
+	private void PlaySfxThroughGameController (AudioClip clip, float volMultiplier = 1.0f) {
 		if (soundManager.IsSfxEnabled && clip) {
-			AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position, soundManager.SfxVolume);
+			AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position, Mathf.Clamp(soundManager.SfxVolume * volMultiplier, 0.05f, 1f));
 		}
 	}
 }

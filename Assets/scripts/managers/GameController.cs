@@ -9,6 +9,7 @@ public class GameController : MonoBehaviour {
 	private Board board;
 	private Spawner spawner;
 	private Shape activeShape;
+	private SoundManager soundManager;
 	private bool isGameOver;
 	private float timeToDrop;
 	private float dropInterval = 0.5f;
@@ -23,11 +24,13 @@ public class GameController : MonoBehaviour {
 	
 	private void Start () {
 		gameOverPanel.SetActive(false);
-		board = GameObject.FindWithTag("board").GetComponent<Board>();
-		spawner = GameObject.FindWithTag("spawner").GetComponent<Spawner>();
+		board = GameObject.FindObjectOfType<Board>();
+		spawner = GameObject.FindObjectOfType<Spawner>();
+		soundManager = GameObject.FindObjectOfType<SoundManager>();
 		Assert.IsNotNull(gameOverPanel);
 		Assert.IsNotNull(board);
 		Assert.IsNotNull(spawner);
+		Assert.IsNotNull(soundManager);
 
 		spawner.transform.position = Vectorf.Round(spawner.transform.position);
 		if (activeShape == null) {
@@ -36,7 +39,7 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void Update () {
-		if (!board || !spawner || !activeShape || isGameOver) {
+		if (!board || !spawner || !activeShape || isGameOver || !soundManager) {
 			return;
 		}
 		GetPlayerInput();
@@ -48,18 +51,21 @@ public class GameController : MonoBehaviour {
 
 	private void GetPlayerInput () {
 		if (Input.GetButton("MoveRight") && Time.time > timeToNextKeyLeftRight || Input.GetButtonDown("MoveRight")) {
+			PlaySfxThroughGameController(soundManager.MoveSound);
 			activeShape.MoveRight();
 			timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
 			if (!board.IsValidPosition(activeShape)) {
 				activeShape.MoveLeft();
 			}
 		} else if (Input.GetButton("MoveLeft") && Time.time > timeToNextKeyLeftRight || Input.GetButtonDown("MoveLeft")) {
+			PlaySfxThroughGameController(soundManager.MoveSound);
 			activeShape.MoveLeft();
 			timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
 			if (!board.IsValidPosition(activeShape)) {
 				activeShape.MoveRight();
 			}
 		} else if (Input.GetButtonDown("Rotate")) { //&& Time.time > timeToNextKeyRotate) {
+			PlaySfxThroughGameController(soundManager.MoveSound);
 			activeShape.RotateRight();
 			//timeToNextKeyRotate = Time.time + keyRepeatRateRotate;
 			if (!board.IsValidPosition(activeShape)) {
@@ -88,11 +94,20 @@ public class GameController : MonoBehaviour {
 		board.StoreShapeInGrid(activeShape);
 		activeShape = spawner.SpawnShape();
 		board.ClearFullRows();
+
+		PlaySfxThroughGameController(soundManager.DropSound);
 	}
 
 	private void GameOver() {
 		activeShape.MoveUp();
 		isGameOver = true;
 		gameOverPanel.SetActive(true);
+		PlaySfxThroughGameController(soundManager.GameOverSound);
+	}
+
+	private void PlaySfxThroughGameController (AudioClip clip) {
+		if (soundManager.IsSfxEnabled && clip) {
+			AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position, soundManager.SfxVolume);
+		}
 	}
 }

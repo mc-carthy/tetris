@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour {
 
+	[SerializeField]
+	private GameObject gameOverPanel;
 	private Board board;
 	private Spawner spawner;
 	private Shape activeShape;
+	private bool isGameOver;
 	private float timeToDrop;
 	private float dropInterval = 0.5f;
 	private float timeToNextKey;
@@ -18,8 +22,10 @@ public class GameController : MonoBehaviour {
 	// private float keyRepeatRateRotate = 0.1f;
 	
 	private void Start () {
+		gameOverPanel.SetActive(false);
 		board = GameObject.FindWithTag("board").GetComponent<Board>();
 		spawner = GameObject.FindWithTag("spawner").GetComponent<Spawner>();
+		Assert.IsNotNull(gameOverPanel);
 		Assert.IsNotNull(board);
 		Assert.IsNotNull(spawner);
 
@@ -30,10 +36,15 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void Update () {
-		if (!board || !spawner || !activeShape) {
+		if (!board || !spawner || !activeShape || isGameOver) {
 			return;
 		}
 		GetPlayerInput();
+	}
+
+	public void Restart () {
+		Debug.Log("Restarting");
+		SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
 	}
 
 	private void GetPlayerInput () {
@@ -61,7 +72,11 @@ public class GameController : MonoBehaviour {
 			timeToNextKeyDown = Time.time + keyRepeatRateDown;
 			activeShape.MoveDown();
 			if (!board.IsValidPosition(activeShape)) {
-				LandShape();
+				if (board.IsOverLimit(activeShape)) {
+					GameOver();
+				} else {
+					LandShape();
+				}
 			}
 		}
 	}
@@ -74,5 +89,11 @@ public class GameController : MonoBehaviour {
 		board.StoreShapeInGrid(activeShape);
 		activeShape = spawner.SpawnShape();
 		board.ClearFullRows();
+	}
+
+	private void GameOver() {
+		activeShape.MoveUp();
+		isGameOver = true;
+		gameOverPanel.SetActive(true);
 	}
 }

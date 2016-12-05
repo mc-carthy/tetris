@@ -54,6 +54,15 @@ public class Board : MonoBehaviour {
 		}
 	}
 
+	public bool IsOverLimit (Shape shape) {
+		foreach (Transform child in shape.transform) {
+			if (child.transform.position.y >= (boardHeight - header - 1)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private void DrawEmptyCells () {
 		for (int y = 0; y < boardHeight - header; y++) {
 			for (int x = 0; x < boardWidth; x++) {

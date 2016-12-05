@@ -13,20 +13,20 @@ public class Shape : MonoBehaviour {
 		transform.position += moveDirection;
 	}
 
+	public void MoveDown () {
+		Move(new Vector3(0, -1, 0));
+	}
+
+	private void MoveUp () {
+		Move(new Vector3(0, 1, 0));
+	}
+
 	private void MoveLeft () {
 		Move(new Vector3(-1, 0, 0));
 	}
 
 	private void MoveRight () {
 		Move(new Vector3(1, 0, 0));
-	}
-	
-	private void MoveUp () {
-		Move(new Vector3(0, 1, 0));
-	}
-	
-	private void MoveDown () {
-		Move(new Vector3(0, -1, 0));
 	}
 
 	private void RotateLeft () {

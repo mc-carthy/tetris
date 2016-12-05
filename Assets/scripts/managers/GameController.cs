@@ -6,9 +6,9 @@ public class GameController : MonoBehaviour {
 	private Board board;
 	private Spawner spawner;
 	private Shape activeShape;
-	private float dropInterval = 0.25f;
+	private float dropInterval = 0.5f;
 	private float timeToDrop;
-	private float keyRepeatRate = 0.25f;
+	private float keyRepeatRate = 0.1f;
 	private float timeToNextKey;
 	
 	private void Start () {
@@ -28,7 +28,6 @@ public class GameController : MonoBehaviour {
 			return;
 		}
 		GetPlayerInput();
-		DropActiveShape();
 	}
 
 	private void GetPlayerInput () {
@@ -51,22 +50,20 @@ public class GameController : MonoBehaviour {
 				activeShape.RotateLeft();
 			}
 		}
-		if (Input.GetButton("MoveDown")) {
-			
+		if (Input.GetButton("MoveDown") && Time.time > timeToNextKey || Time.time > timeToDrop) {
+			timeToDrop = Time.time + dropInterval;
+			timeToNextKey = Time.time + keyRepeatRate;
+			activeShape.MoveDown();
+			if (!board.IsValidPosition(activeShape)) {
+				LandShape();
+			}
 		}
 	}
 
-	private void DropActiveShape () {
-		if (Time.time > timeToDrop) {
-			timeToDrop = Time.time + dropInterval;
-			if (activeShape) {
-				activeShape.MoveDown();
-				if (!board.IsValidPosition(activeShape)) {
-					activeShape.MoveUp();
-					board.StoreShapeInGrid(activeShape);
-					activeShape = spawner.SpawnShape();
-				}
-			}
-		}
+	private void LandShape () {
+		timeToNextKey = Time.time;
+		activeShape.MoveUp();
+		board.StoreShapeInGrid(activeShape);
+		activeShape = spawner.SpawnShape();
 	}
 }

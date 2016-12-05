@@ -54,6 +54,7 @@ public class GameController : MonoBehaviour {
 			activeShape.MoveRight();
 			timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
 			if (!board.IsValidPosition(activeShape)) {
+				PlaySfxThroughGameController(soundManager.ErrorSound);
 				activeShape.MoveLeft();
 			} else {
 				PlaySfxThroughGameController(soundManager.MoveSound);
@@ -63,6 +64,7 @@ public class GameController : MonoBehaviour {
 			activeShape.MoveLeft();
 			timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
 			if (!board.IsValidPosition(activeShape)) {
+				PlaySfxThroughGameController(soundManager.ErrorSound);
 				activeShape.MoveRight();
 			} else {
 				PlaySfxThroughGameController(soundManager.MoveSound);
@@ -71,6 +73,7 @@ public class GameController : MonoBehaviour {
 			activeShape.RotateRight();
 			//timeToNextKeyRotate = Time.time + keyRepeatRateRotate;
 			if (!board.IsValidPosition(activeShape)) {
+				PlaySfxThroughGameController(soundManager.ErrorSound);
 				activeShape.RotateLeft();
 			} else {
 				PlaySfxThroughGameController(soundManager.MoveSound);

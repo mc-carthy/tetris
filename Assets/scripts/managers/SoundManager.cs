@@ -34,6 +34,14 @@ public class SoundManager : MonoBehaviour {
 		}
 	}
 
+	[SerializeField]
+	private AudioClip errorSound;
+	public AudioClip ErrorSound {
+		get {
+			return errorSound;
+		}
+	}
+
 	[Range(0, 1)]
 	private float musicVolume = 1.0f;
 	public float MusicVolume {

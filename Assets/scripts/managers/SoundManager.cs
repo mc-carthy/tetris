@@ -50,6 +50,22 @@ public class SoundManager : MonoBehaviour {
 		}
 	}
 
+	[SerializeField]
+	private AudioClip gameOverVocal;
+	public AudioClip GameOverVocal {
+		get {
+			return gameOverVocal;
+		}
+	}
+
+	[SerializeField]
+	private AudioClip levelUpVocal;
+	public AudioClip LevelUpVocal {
+		get {
+			return levelUpVocal;
+		}
+	}
+
 	[Range(0, 1)]
 	private float musicVolume = 1.0f;
 	public float MusicVolume {

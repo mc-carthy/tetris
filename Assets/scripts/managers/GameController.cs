@@ -114,6 +114,7 @@ public class GameController : MonoBehaviour {
 		isGameOver = true;
 		gameOverPanel.SetActive(true);
 		PlaySfxThroughGameController(soundManager.GameOverSound, 5.0f);
+		PlaySfxThroughGameController(soundManager.GameOverVocal, 5.0f);
 	}
 
 	private void PlaySfxThroughGameController (AudioClip clip, float volMultiplier = 1.0f) {

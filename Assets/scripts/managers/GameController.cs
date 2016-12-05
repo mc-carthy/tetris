@@ -57,17 +57,16 @@ public class GameController : MonoBehaviour {
 				PlaySfxThroughGameController(soundManager.ErrorSound);
 				activeShape.MoveLeft();
 			} else {
-				PlaySfxThroughGameController(soundManager.MoveSound);
+				PlaySfxThroughGameController(soundManager.MoveSound, 0.5f);
 			}
 		} else if (Input.GetButton("MoveLeft") && Time.time > timeToNextKeyLeftRight || Input.GetButtonDown("MoveLeft")) {
-			PlaySfxThroughGameController(soundManager.MoveSound);
 			activeShape.MoveLeft();
 			timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
 			if (!board.IsValidPosition(activeShape)) {
 				PlaySfxThroughGameController(soundManager.ErrorSound);
 				activeShape.MoveRight();
 			} else {
-				PlaySfxThroughGameController(soundManager.MoveSound);
+				PlaySfxThroughGameController(soundManager.MoveSound, 0.5f);
 			}
 		} else if (Input.GetButtonDown("Rotate")) { //&& Time.time > timeToNextKeyRotate) {
 			activeShape.RotateRight();
@@ -76,7 +75,7 @@ public class GameController : MonoBehaviour {
 				PlaySfxThroughGameController(soundManager.ErrorSound);
 				activeShape.RotateLeft();
 			} else {
-				PlaySfxThroughGameController(soundManager.MoveSound);
+				PlaySfxThroughGameController(soundManager.MoveSound, 0.5f);
 			}
 		}
 		if (Input.GetButton("MoveDown") && Time.time > timeToNextKeyDown || Time.time > timeToDrop) {
@@ -102,14 +101,18 @@ public class GameController : MonoBehaviour {
 		activeShape = spawner.SpawnShape();
 		board.ClearFullRows();
 
-		PlaySfxThroughGameController(soundManager.DropSound);
+		PlaySfxThroughGameController(soundManager.DropSound, 0.25f);
+
+		if (board.CompletedRows > 0) {
+			PlaySfxThroughGameController(soundManager.ClearRowSound);
+		}
 	}
 
 	private void GameOver() {
 		activeShape.MoveUp();
 		isGameOver = true;
 		gameOverPanel.SetActive(true);
-		PlaySfxThroughGameController(soundManager.GameOverSound);
+		PlaySfxThroughGameController(soundManager.GameOverSound, 5.0f);
 	}
 
 	private void PlaySfxThroughGameController (AudioClip clip, float volMultiplier = 1.0f) {

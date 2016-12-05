@@ -3,6 +3,13 @@ using UnityEngine.Assertions;
 
 public class Board : MonoBehaviour {
 
+	private int completedRows;
+	public int CompletedRows {
+		get {
+			return completedRows;
+		}
+	}
+
 	[SerializeField]
 	private Transform emptyCellPrefab;
 	[SerializeField]
@@ -45,8 +52,11 @@ public class Board : MonoBehaviour {
 	}
 
 	public void ClearFullRows () {
+		completedRows = 0;
 		for (int y = 0; y < boardHeight; ++y) {
 			if (IsCompleteRow(y)) {
+				completedRows++;
+				Debug.Log(completedRows.ToString());
 				ClearRow(y);
 				ShiftRowsDown(y + 1);
 				y--;

@@ -6,7 +6,7 @@ public class GameController : MonoBehaviour {
 	private Board board;
 	private Spawner spawner;
 	private Shape activeShape;
-	private float dropInterval = 1f;
+	private float dropInterval = 0.25f;
 	private float timeToDrop;
 	
 	private void Start () {
@@ -26,6 +26,10 @@ public class GameController : MonoBehaviour {
 			timeToDrop = Time.time + dropInterval;
 			if (activeShape) {
 				activeShape.MoveDown();
+				if (!board.IsValidPosition(activeShape)) {
+					activeShape.MoveUp();
+					activeShape = spawner.SpawnShape();
+				}
 			}
 		}
 	}

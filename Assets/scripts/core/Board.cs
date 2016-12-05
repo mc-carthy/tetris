@@ -30,4 +30,19 @@ public class Board : MonoBehaviour {
 		}
 	}
 
+	private bool IsWithinBoard (int x, int y) {
+		return (x >= 0 && x < boardWidth && y >= 0);
+	}
+
+	public bool IsValidPosition (Shape shape) {
+		foreach (Transform child in shape.transform) {
+			Vector2 pos = Vectorf.Round(child.position);
+
+			if (!IsWithinBoard((int)pos.x, (int)pos.y)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 }

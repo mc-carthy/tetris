@@ -6,10 +6,16 @@ public class GameController : MonoBehaviour {
 	private Board board;
 	private Spawner spawner;
 	private Shape activeShape;
-	private float dropInterval = 0.5f;
 	private float timeToDrop;
-	private float keyRepeatRate = 0.1f;
+	private float dropInterval = 0.5f;
 	private float timeToNextKey;
+	private float keyRepeatRate = 0.1f;
+	private float timeToNextKeyLeftRight;
+	private float keyRepeatRateLeftRight = 0.1f;
+	private float timeToNextKeyDown;
+	private float keyRepeatRateDown = 0.05f;
+	// private float timeToNextKeyRotate;
+	// private float keyRepeatRateRotate = 0.1f;
 	
 	private void Start () {
 		board = GameObject.FindWithTag("board").GetComponent<Board>();
@@ -31,28 +37,28 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void GetPlayerInput () {
-		if (Input.GetButton("MoveRight") && Time.time > timeToNextKey || Input.GetButtonDown("MoveRight")) {
+		if (Input.GetButton("MoveRight") && Time.time > timeToNextKeyLeftRight || Input.GetButtonDown("MoveRight")) {
 			activeShape.MoveRight();
-			timeToNextKey = Time.time + keyRepeatRate;
+			timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
 			if (!board.IsValidPosition(activeShape)) {
 				activeShape.MoveLeft();
 			}
-		} else if (Input.GetButton("MoveLeft") && Time.time > timeToNextKey || Input.GetButtonDown("MoveLeft")) {
+		} else if (Input.GetButton("MoveLeft") && Time.time > timeToNextKeyLeftRight || Input.GetButtonDown("MoveLeft")) {
 			activeShape.MoveLeft();
-			timeToNextKey = Time.time + keyRepeatRate;
+			timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
 			if (!board.IsValidPosition(activeShape)) {
 				activeShape.MoveRight();
 			}
-		} else if (Input.GetButtonDown("Rotate")) {
+		} else if (Input.GetButtonDown("Rotate")) { //&& Time.time > timeToNextKeyRotate) {
 			activeShape.RotateRight();
-			timeToNextKey = Time.time + keyRepeatRate;
+			//timeToNextKeyRotate = Time.time + keyRepeatRateRotate;
 			if (!board.IsValidPosition(activeShape)) {
 				activeShape.RotateLeft();
 			}
 		}
-		if (Input.GetButton("MoveDown") && Time.time > timeToNextKey || Time.time > timeToDrop) {
+		if (Input.GetButton("MoveDown") && Time.time > timeToNextKeyDown || Time.time > timeToDrop) {
 			timeToDrop = Time.time + dropInterval;
-			timeToNextKey = Time.time + keyRepeatRate;
+			timeToNextKeyDown = Time.time + keyRepeatRateDown;
 			activeShape.MoveDown();
 			if (!board.IsValidPosition(activeShape)) {
 				LandShape();
@@ -61,7 +67,9 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void LandShape () {
-		timeToNextKey = Time.time;
+		timeToNextKeyLeftRight = Time.time;
+		timeToNextKeyDown = Time.time;
+		//timeToNextKeyRotate = Time.time;
 		activeShape.MoveUp();
 		board.StoreShapeInGrid(activeShape);
 		activeShape = spawner.SpawnShape();

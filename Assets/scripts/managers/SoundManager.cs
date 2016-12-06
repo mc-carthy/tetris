@@ -19,6 +19,14 @@ public class SoundManager : MonoBehaviour {
 	}
 
 	[SerializeField]
+	private AudioSource backgroundMusicSource;
+	public AudioSource BackgroundMusicSource {
+		get {
+			return backgroundMusicSource;
+		}
+	}
+
+	[SerializeField]
 	private AudioClip[] vocalClips;
 	public AudioClip[] VocalClips {
 		get {
@@ -114,8 +122,6 @@ public class SoundManager : MonoBehaviour {
 
 	[SerializeField]
 	private AudioClip[] musicClips;
-	[SerializeField]
-	private AudioSource backgroundMusicSource;
 	private AudioClip backgroundMusic;
 	private AudioClip randomMusicClip;
 

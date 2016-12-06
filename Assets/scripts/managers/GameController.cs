@@ -8,6 +8,8 @@ public class GameController : MonoBehaviour {
 	private GameObject gameOverPanel;
 	[SerializeField]
 	private IconToggle rotIconToggle;
+	[SerializeField]
+	private GameObject pausePanel;
 	private Board board;
 	private Spawner spawner;
 	private Shape activeShape;
@@ -21,11 +23,13 @@ public class GameController : MonoBehaviour {
 	private float timeToNextKeyDown;
 	private float keyRepeatRateDown = 0.05f;
 	private bool isRotClockwise = true;
+	private bool isGamePaused;
 	// private float timeToNextKeyRotate;
 	// private float keyRepeatRateRotate = 0.1f;
 	
 	private void Start () {
 		gameOverPanel.SetActive(false);
+		pausePanel.SetActive(false);
 		board = GameObject.FindObjectOfType<Board>();
 		spawner = GameObject.FindObjectOfType<Spawner>();
 		soundManager = GameObject.FindObjectOfType<SoundManager>();
@@ -55,6 +59,22 @@ public class GameController : MonoBehaviour {
 		isRotClockwise = !isRotClockwise;
 		if (rotIconToggle) {
 			rotIconToggle.ToggleIcon(isRotClockwise);
+		}
+	}
+
+	public void TogglePause () {
+		if (isGameOver) {
+			return;
+		}
+
+		isGamePaused = !isGamePaused;
+
+		if (pausePanel) {
+			pausePanel.SetActive(isGamePaused);
+			if (soundManager) {
+				soundManager.BackgroundMusicSource.volume = isGamePaused ? soundManager.MusicVolume * 0.25f : soundManager.MusicVolume;
+			}
+			Time.timeScale = isGamePaused ? 0f : 1f;
 		}
 	}
 

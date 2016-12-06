@@ -6,10 +6,13 @@ public class GameController : MonoBehaviour {
 
 	[SerializeField]
 	private GameObject gameOverPanel;
+	[SerializeField]
+	private IconToggle rotIconToggle;
 	private Board board;
 	private Spawner spawner;
 	private Shape activeShape;
 	private SoundManager soundManager;
+
 	private bool isGameOver;
 	private float timeToDrop;
 	private float dropInterval = 0.5f;
@@ -17,6 +20,7 @@ public class GameController : MonoBehaviour {
 	private float keyRepeatRateLeftRight = 0.1f;
 	private float timeToNextKeyDown;
 	private float keyRepeatRateDown = 0.05f;
+	private bool isRotClockwise = true;
 	// private float timeToNextKeyRotate;
 	// private float keyRepeatRateRotate = 0.1f;
 	
@@ -47,6 +51,13 @@ public class GameController : MonoBehaviour {
 		SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
 	}
 
+	public void ToggleRotDirection () {
+		isRotClockwise = !isRotClockwise;
+		if (rotIconToggle) {
+			rotIconToggle.ToggleIcon(isRotClockwise);
+		}
+	}
+
 	private void GetPlayerInput () {
 		if (Input.GetButton("MoveRight") && Time.time > timeToNextKeyLeftRight || Input.GetButtonDown("MoveRight")) {
 			activeShape.MoveRight();
@@ -67,14 +78,16 @@ public class GameController : MonoBehaviour {
 				PlaySfxThroughGameController(soundManager.MoveSound, 0.5f);
 			}
 		} else if (Input.GetButtonDown("Rotate")) { //&& Time.time > timeToNextKeyRotate) {
-			activeShape.RotateRight();
+			activeShape.RotateClockwise(isRotClockwise);
 			//timeToNextKeyRotate = Time.time + keyRepeatRateRotate;
 			if (!board.IsValidPosition(activeShape)) {
 				PlaySfxThroughGameController(soundManager.ErrorSound);
-				activeShape.RotateLeft();
+				activeShape.RotateClockwise(!isRotClockwise);
 			} else {
 				PlaySfxThroughGameController(soundManager.MoveSound, 0.5f);
 			}
+		} else if (Input.GetButtonDown("ToggleRot")) {
+			ToggleRotDirection();
 		}
 		if (Input.GetButton("MoveDown") && Time.time > timeToNextKeyDown || Time.time > timeToDrop) {
 			timeToDrop = Time.time + dropInterval;

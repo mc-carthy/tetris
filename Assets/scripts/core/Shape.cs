@@ -40,4 +40,12 @@ public class Shape : MonoBehaviour {
 			transform.Rotate(0, 0, -90);
 		}
 	}
+
+	public void RotateClockwise (bool isRotClockwise) {
+		if (isRotClockwise) {
+			RotateRight();
+		} else {
+			RotateLeft();
+		}
+	} 
 }

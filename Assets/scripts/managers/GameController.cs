@@ -173,7 +173,7 @@ public class GameController : MonoBehaviour {
 		}
 
 		activeShape = spawner.SpawnShape();
-		board.ClearFullRows();
+		board.StartCoroutine("ClearFullRows");
 
 		PlaySfxThroughGameController(soundManager.DropSound, 0.25f);
 

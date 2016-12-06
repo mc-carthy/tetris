@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
+using System.Collections;
 
 public class Board : MonoBehaviour {
 
@@ -13,7 +14,7 @@ public class Board : MonoBehaviour {
 	[SerializeField]
 	private Transform emptyCellPrefab;
 	[SerializeField]
-	private ParticlePlayer rowGlowFx;
+	private ParticlePlayer[] rowGlowFx = new ParticlePlayer[4];
 	[SerializeField]
 	private int boardWidth, boardHeight, header;
 
@@ -53,14 +54,22 @@ public class Board : MonoBehaviour {
 		}
 	}
 
-	public void ClearFullRows () {
+	public IEnumerator ClearFullRows () {
 		completedRows = 0;
 		for (int y = 0; y < boardHeight; ++y) {
 			if (IsCompleteRow(y)) {
+				ClearRowFx(completedRows, y);
 				completedRows++;
+			}
+		}
+
+		yield return new WaitForSeconds(0.5f);
+
+		for (int y = 0; y < boardHeight; ++y) {
+			if (IsCompleteRow(y)) {
 				ClearRow(y);
-				ClearRowFx(y);
 				ShiftRowsDown(y + 1);
+				yield return new WaitForSeconds(0.2f);
 				y--;
 			}
 		}
@@ -128,10 +137,10 @@ public class Board : MonoBehaviour {
 		}
 	}
 
-	private void ClearRowFx (int y) {
-		if (rowGlowFx) {
-			rowGlowFx.transform.position = new Vector3(0, y, -1);
-			rowGlowFx.Play();
+	private void ClearRowFx (int id, int y) {
+		if (rowGlowFx[id]) {
+			rowGlowFx[id].transform.position = new Vector3(0, y, -1);
+			rowGlowFx[id].Play();
 		}
 	}
 }

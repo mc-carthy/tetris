@@ -142,8 +142,12 @@ public class GameController : MonoBehaviour {
 
 		if (board.CompletedRows > 0) {
 			scoreManager.ScoreLines(board.CompletedRows);
-			if (board.CompletedRows > 1) {
-				PlaySfxThroughGameController(soundManager.GetRandomClip(soundManager.VocalClips));
+			if (scoreManager.IsLevelingUp) {
+				PlaySfxThroughGameController(soundManager.LevelUpVocal);
+			} else {
+				if (board.CompletedRows > 1) {
+					PlaySfxThroughGameController(soundManager.GetRandomClip(soundManager.VocalClips));
+				}
 			}
 			PlaySfxThroughGameController(soundManager.ClearRowSound);
 		}

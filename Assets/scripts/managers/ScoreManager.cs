@@ -6,6 +6,13 @@ public class ScoreManager : MonoBehaviour {
 	private const int minLines = 1;
 	private const int maxLines = 4;
 
+	private bool isLevelingUp;
+	public bool IsLevelingUp {
+		get {
+			return isLevelingUp;
+		}
+	}
+
 	[SerializeField]
 	private Text linesText;
 	[SerializeField]
@@ -16,14 +23,15 @@ public class ScoreManager : MonoBehaviour {
 	private int score;
 	private int lines;
 	private int level = 1;
-	private int linesPerLevel;
+	private int linesPerLevel = 5;
 
 	private void Start () {
-		UpdateUIText();
+		Reset();
 	}
 
 	public void ScoreLines (int lines) {
 		lines = Mathf.Clamp(lines, minLines, maxLines);
+		isLevelingUp = false;
 
 		switch (lines) {
 			case 1:
@@ -39,12 +47,25 @@ public class ScoreManager : MonoBehaviour {
 				score += 1200 * level;
 				break;
 		}
+
+		this.lines -= lines;
+		if (this.lines <= 0) {
+			LevelUp();
+		}
+
 		UpdateUIText();
 	}
 
 	public void Reset () {
 		level = 1;
 		lines = linesPerLevel * level;
+		UpdateUIText();
+	}
+
+	private void LevelUp () {
+		level++;
+		lines = linesPerLevel * level;
+		isLevelingUp = true;
 	}
 
 	private void UpdateUIText () {
@@ -59,7 +80,7 @@ public class ScoreManager : MonoBehaviour {
 	private string PadZeros (int score, int padDigits) {
 		string str = score.ToString();
 		while (str.Length < padDigits) {
-			str += "0";
+			str = "0" + str;
 		}
 		return str;
 	}

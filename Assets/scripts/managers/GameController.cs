@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour {
 	private Shape activeShape;
 	private SoundManager soundManager;
 	private ScoreManager scoreManager;
+	private Ghost ghost;
 
 	private bool isGameOver;
 	private float timeToDrop;
@@ -36,6 +37,7 @@ public class GameController : MonoBehaviour {
 		spawner = GameObject.FindObjectOfType<Spawner>();
 		soundManager = GameObject.FindObjectOfType<SoundManager>();
 		scoreManager = GameObject.FindObjectOfType<ScoreManager>();
+		ghost = GameObject.FindObjectOfType<Ghost>();
 		Assert.IsNotNull(gameOverPanel);
 		Assert.IsNotNull(board);
 		Assert.IsNotNull(spawner);
@@ -55,6 +57,12 @@ public class GameController : MonoBehaviour {
 			return;
 		}
 		GetPlayerInput();
+	}
+
+	private void LateUpdate () {
+		if (ghost) {
+			ghost.DrawGhost(activeShape, board);
+		}
 	}
 
 	public void Restart () {
@@ -86,7 +94,7 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void GetPlayerInput () {
-		if (Input.GetButton("MoveRight") && Time.time > timeToNextKeyLeftRight || Input.GetButtonDown("MoveRight")) {
+		if ((Input.GetButton("MoveRight") && Time.time > timeToNextKeyLeftRight) || Input.GetButtonDown("MoveRight")) {
 			activeShape.MoveRight();
 			timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
 			if (!board.IsValidPosition(activeShape)) {
@@ -95,7 +103,7 @@ public class GameController : MonoBehaviour {
 			} else {
 				PlaySfxThroughGameController(soundManager.MoveSound, 0.5f);
 			}
-		} else if (Input.GetButton("MoveLeft") && Time.time > timeToNextKeyLeftRight || Input.GetButtonDown("MoveLeft")) {
+		} else if ((Input.GetButton("MoveLeft") && Time.time > timeToNextKeyLeftRight) || Input.GetButtonDown("MoveLeft")) {
 			activeShape.MoveLeft();
 			timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
 			if (!board.IsValidPosition(activeShape)) {
@@ -118,7 +126,7 @@ public class GameController : MonoBehaviour {
 		} else if (Input.GetButtonDown("TogglePause")) {
 			TogglePause();
 		}
-		if (Input.GetButton("MoveDown") && Time.time > timeToNextKeyDown || Time.time > timeToDrop) {
+		if ((Input.GetButton("MoveDown") && Time.time > timeToNextKeyDown) || Time.time > timeToDrop) {
 			timeToDrop = Time.time + dropIntervalMod;
 			timeToNextKeyDown = Time.time + keyRepeatRateDown;
 			activeShape.MoveDown();
@@ -138,6 +146,11 @@ public class GameController : MonoBehaviour {
 		//timeToNextKeyRotate = Time.time;
 		activeShape.MoveUp();
 		board.StoreShapeInGrid(activeShape);
+
+		if (ghost) {
+			ghost.Reset();
+		}
+
 		activeShape = spawner.SpawnShape();
 		board.ClearFullRows();
 

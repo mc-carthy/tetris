@@ -56,7 +56,6 @@ public class Board : MonoBehaviour {
 		for (int y = 0; y < boardHeight; ++y) {
 			if (IsCompleteRow(y)) {
 				completedRows++;
-				Debug.Log(completedRows.ToString());
 				ClearRow(y);
 				ShiftRowsDown(y + 1);
 				y--;

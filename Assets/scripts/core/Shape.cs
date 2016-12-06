@@ -4,6 +4,13 @@ public class Shape : MonoBehaviour {
 
 	[SerializeField]
 	private bool isRotatable;
+	[SerializeField]
+	private Vector3 queueOffset;
+	public Vector3 QueueOffset {
+		get {
+			return queueOffset;
+		}
+	}
 
 	private void Start () {
 

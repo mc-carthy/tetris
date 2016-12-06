@@ -13,6 +13,8 @@ public class Board : MonoBehaviour {
 	[SerializeField]
 	private Transform emptyCellPrefab;
 	[SerializeField]
+	private ParticlePlayer rowGlowFx;
+	[SerializeField]
 	private int boardWidth, boardHeight, header;
 
 	private Transform[,] grid;
@@ -57,6 +59,7 @@ public class Board : MonoBehaviour {
 			if (IsCompleteRow(y)) {
 				completedRows++;
 				ClearRow(y);
+				ClearRowFx(y);
 				ShiftRowsDown(y + 1);
 				y--;
 			}
@@ -122,6 +125,13 @@ public class Board : MonoBehaviour {
 	private void ShiftRowsDown (int StartY) {
 		for (int y = StartY; y < boardHeight; y++) {
 			ShiftOneRowDown(y);
+		}
+	}
+
+	private void ClearRowFx (int y) {
+		if (rowGlowFx) {
+			rowGlowFx.transform.position = new Vector3(0, y, -1);
+			rowGlowFx.Play();
 		}
 	}
 }

@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour {
 	private Spawner spawner;
 	private Shape activeShape;
 	private SoundManager soundManager;
+	private ScoreManager scoreManager;
 
 	private bool isGameOver;
 	private float timeToDrop;
@@ -33,10 +34,12 @@ public class GameController : MonoBehaviour {
 		board = GameObject.FindObjectOfType<Board>();
 		spawner = GameObject.FindObjectOfType<Spawner>();
 		soundManager = GameObject.FindObjectOfType<SoundManager>();
+		scoreManager = GameObject.FindObjectOfType<ScoreManager>();
 		Assert.IsNotNull(gameOverPanel);
 		Assert.IsNotNull(board);
 		Assert.IsNotNull(spawner);
 		Assert.IsNotNull(soundManager);
+		Assert.IsNotNull(scoreManager);
 
 		spawner.transform.position = Vectorf.Round(spawner.transform.position);
 		if (activeShape == null) {
@@ -45,7 +48,7 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void Update () {
-		if (!board || !spawner || !activeShape || isGameOver || !soundManager) {
+		if (!board || !spawner || !activeShape || isGameOver || !soundManager || !scoreManager) {
 			return;
 		}
 		GetPlayerInput();
@@ -138,6 +141,7 @@ public class GameController : MonoBehaviour {
 		PlaySfxThroughGameController(soundManager.DropSound, 0.25f);
 
 		if (board.CompletedRows > 0) {
+			scoreManager.ScoreLines(board.CompletedRows);
 			if (board.CompletedRows > 1) {
 				PlaySfxThroughGameController(soundManager.GetRandomClip(soundManager.VocalClips));
 			}

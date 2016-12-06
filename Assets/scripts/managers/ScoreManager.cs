@@ -6,6 +6,13 @@ public class ScoreManager : MonoBehaviour {
 	private const int minLines = 1;
 	private const int maxLines = 4;
 
+	private int level = 1;
+	public int Level {
+		get {
+			return level;
+		}
+	}
+
 	private bool isLevelingUp;
 	public bool IsLevelingUp {
 		get {
@@ -22,7 +29,6 @@ public class ScoreManager : MonoBehaviour {
 
 	private int score;
 	private int lines;
-	private int level = 1;
 	private int linesPerLevel = 5;
 
 	private void Start () {

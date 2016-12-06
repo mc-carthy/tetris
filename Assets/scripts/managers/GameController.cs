@@ -18,7 +18,8 @@ public class GameController : MonoBehaviour {
 
 	private bool isGameOver;
 	private float timeToDrop;
-	private float dropInterval = 0.5f;
+	private float dropInterval = 1f;
+	private float dropIntervalMod;
 	private float timeToNextKeyLeftRight;
 	private float keyRepeatRateLeftRight = 0.1f;
 	private float timeToNextKeyDown;
@@ -45,6 +46,8 @@ public class GameController : MonoBehaviour {
 		if (activeShape == null) {
 			activeShape = spawner.SpawnShape();
 		}
+
+		dropIntervalMod = dropInterval;
 	}
 
 	private void Update () {
@@ -116,7 +119,7 @@ public class GameController : MonoBehaviour {
 			TogglePause();
 		}
 		if (Input.GetButton("MoveDown") && Time.time > timeToNextKeyDown || Time.time > timeToDrop) {
-			timeToDrop = Time.time + dropInterval;
+			timeToDrop = Time.time + dropIntervalMod;
 			timeToNextKeyDown = Time.time + keyRepeatRateDown;
 			activeShape.MoveDown();
 			if (!board.IsValidPosition(activeShape)) {
@@ -144,6 +147,7 @@ public class GameController : MonoBehaviour {
 			scoreManager.ScoreLines(board.CompletedRows);
 			if (scoreManager.IsLevelingUp) {
 				PlaySfxThroughGameController(soundManager.LevelUpVocal);
+				dropIntervalMod = Mathf.Clamp(dropInterval - (((float)scoreManager.Level - 1) * 0.05f), 0.05f, 1f);
 			} else {
 				if (board.CompletedRows > 1) {
 					PlaySfxThroughGameController(soundManager.GetRandomClip(soundManager.VocalClips));

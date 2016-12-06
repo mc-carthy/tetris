@@ -52,6 +52,7 @@ public class GameController : MonoBehaviour {
 	}
 
 	public void Restart () {
+		Time.timeScale = 1;
 		SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
 	}
 
@@ -108,6 +109,8 @@ public class GameController : MonoBehaviour {
 			}
 		} else if (Input.GetButtonDown("ToggleRot")) {
 			ToggleRotDirection();
+		} else if (Input.GetButtonDown("TogglePause")) {
+			TogglePause();
 		}
 		if (Input.GetButton("MoveDown") && Time.time > timeToNextKeyDown || Time.time > timeToDrop) {
 			timeToDrop = Time.time + dropInterval;

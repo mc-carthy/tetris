@@ -16,10 +16,11 @@ public class GameController : MonoBehaviour {
 	private SoundManager soundManager;
 	private ScoreManager scoreManager;
 	private Ghost ghost;
+	private Holder holder;
 
 	private bool isGameOver;
 	private float timeToDrop;
-	private float dropInterval = 1f;
+	private float dropInterval = 0.5f;
 	private float dropIntervalMod;
 	private float timeToNextKeyLeftRight;
 	private float keyRepeatRateLeftRight = 0.1f;
@@ -33,16 +34,9 @@ public class GameController : MonoBehaviour {
 	private void Start () {
 		gameOverPanel.SetActive(false);
 		pausePanel.SetActive(false);
-		board = GameObject.FindObjectOfType<Board>();
-		spawner = GameObject.FindObjectOfType<Spawner>();
-		soundManager = GameObject.FindObjectOfType<SoundManager>();
-		scoreManager = GameObject.FindObjectOfType<ScoreManager>();
-		ghost = GameObject.FindObjectOfType<Ghost>();
-		Assert.IsNotNull(gameOverPanel);
-		Assert.IsNotNull(board);
-		Assert.IsNotNull(spawner);
-		Assert.IsNotNull(soundManager);
-		Assert.IsNotNull(scoreManager);
+
+		GetReferences();
+		MakeAssertions();
 
 		spawner.transform.position = Vectorf.Round(spawner.transform.position);
 		if (activeShape == null) {
@@ -93,6 +87,27 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
+	public void Hold () {
+		if (!holder.HoldShape) {
+			holder.Catch(activeShape);
+			activeShape = spawner.SpawnShape();
+			PlaySfxThroughGameController(soundManager.HoldSound);
+		} else if (holder.IsReleaseable) {
+			Shape shape = activeShape;
+			activeShape = holder.Release();
+			activeShape.transform.position = spawner.transform.position;
+			holder.Catch(shape);
+			PlaySfxThroughGameController(soundManager.HoldSound);
+		} else {
+			Debug.LogWarning("Holder Warning: Wait for cooldown");
+			PlaySfxThroughGameController(soundManager.ErrorSound);
+		}
+
+		if (ghost) {
+			ghost.Reset();
+		}
+	}
+
 	private void GetPlayerInput () {
 		if ((Input.GetButton("MoveRight") && Time.time > timeToNextKeyLeftRight) || Input.GetButtonDown("MoveRight")) {
 			activeShape.MoveRight();
@@ -121,6 +136,8 @@ public class GameController : MonoBehaviour {
 			} else {
 				PlaySfxThroughGameController(soundManager.MoveSound, 0.5f);
 			}
+		} else if (Input.GetButtonDown("Hold")) {
+			Hold();
 		} else if (Input.GetButtonDown("ToggleRot")) {
 			ToggleRotDirection();
 		} else if (Input.GetButtonDown("TogglePause")) {
@@ -149,6 +166,10 @@ public class GameController : MonoBehaviour {
 
 		if (ghost) {
 			ghost.Reset();
+		}
+
+		if (holder) {
+			holder.IsReleaseable = true;
 		}
 
 		activeShape = spawner.SpawnShape();
@@ -182,5 +203,23 @@ public class GameController : MonoBehaviour {
 		if (soundManager.IsSfxEnabled && clip) {
 			AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position, Mathf.Clamp(soundManager.SfxVolume * volMultiplier, 0.05f, 1f));
 		}
+	}
+
+	private void GetReferences() {
+		board = GameObject.FindObjectOfType<Board>();
+		spawner = GameObject.FindObjectOfType<Spawner>();
+		soundManager = GameObject.FindObjectOfType<SoundManager>();
+		scoreManager = GameObject.FindObjectOfType<ScoreManager>();
+		ghost = GameObject.FindObjectOfType<Ghost>();
+		holder = GameObject.FindObjectOfType<Holder>();
+	}
+
+	private void MakeAssertions () {
+		Assert.IsNotNull(gameOverPanel);
+		Assert.IsNotNull(board);
+		Assert.IsNotNull(spawner);
+		Assert.IsNotNull(soundManager);
+		Assert.IsNotNull(scoreManager);
+		Assert.IsNotNull(holder);
 	}
 }

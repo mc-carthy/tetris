@@ -75,6 +75,14 @@ public class SoundManager : MonoBehaviour {
 	}
 
 	[SerializeField]
+	private AudioClip holdSound;
+	public AudioClip HoldSound {
+		get {
+			return holdSound;
+		}
+	}
+
+	[SerializeField]
 	private AudioClip gameOverVocal;
 	public AudioClip GameOverVocal {
 		get {

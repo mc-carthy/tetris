@@ -35,6 +35,7 @@ public class Holder : MonoBehaviour {
 		if (holdTransform) {
 			shape.transform.position = holdTransform.transform.position + shape.QueueOffset;
 			shape.transform.localScale = Vector3.one * holdScale;
+			shape.transform.rotation = Quaternion.identity;
 			holdShape = shape;
 		}
 	}

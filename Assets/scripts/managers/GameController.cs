@@ -1,10 +1,17 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using System.Collections;
 
 public class GameController : MonoBehaviour {
+
+	private enum Direction {
+		none,
+		left,
+		right,
+		up,
+		down
+	}
 
 	[SerializeField]
 	private GameObject gameOverPanel;
@@ -14,8 +21,6 @@ public class GameController : MonoBehaviour {
 	private GameObject pausePanel;
 	[SerializeField]
 	private ParticlePlayer gameOverFx;
-	[SerializeField]
-	private Text diagnosticText;
 	private Board board;
 	private Spawner spawner;
 	private Shape activeShape;
@@ -23,6 +28,8 @@ public class GameController : MonoBehaviour {
 	private ScoreManager scoreManager;
 	private Ghost ghost;
 	private Holder holder;
+	private Direction swipeDirection = Direction.none;
+	private Direction swipeEndDirection = Direction.none;
 
 	private bool isGameOver;
 	private float timeToDrop;
@@ -124,52 +131,81 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
+	private void MoveRight () {
+		activeShape.MoveRight();
+		timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
+		if (!board.IsValidPosition(activeShape)) {
+			PlaySfxThroughGameController(soundManager.ErrorSound);
+			activeShape.MoveLeft();
+		} else {
+			PlaySfxThroughGameController(soundManager.MoveSound, 0.5f);
+		}
+	}
+
+	private void MoveLeft () {
+		activeShape.MoveLeft();
+		timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
+		if (!board.IsValidPosition(activeShape)) {
+			PlaySfxThroughGameController(soundManager.ErrorSound);
+			activeShape.MoveRight();
+		} else {
+			PlaySfxThroughGameController(soundManager.MoveSound, 0.5f);
+		}
+	}
+
+	private void Rotate () {
+		activeShape.RotateClockwise(isRotClockwise);
+		//timeToNextKeyRotate = Time.time + keyRepeatRateRotate;
+		if (!board.IsValidPosition(activeShape)) {
+			PlaySfxThroughGameController(soundManager.ErrorSound);
+			activeShape.RotateClockwise(!isRotClockwise);
+		} else {
+			PlaySfxThroughGameController(soundManager.MoveSound, 0.5f);
+		}
+	}
+
+	private void MoveDown () {
+		timeToDrop = Time.time + dropIntervalMod;
+		timeToNextKeyDown = Time.time + keyRepeatRateDown;
+		activeShape.MoveDown();
+		if (!board.IsValidPosition(activeShape)) {
+			if (board.IsOverLimit(activeShape)) {
+				GameOver();
+			} else {
+				LandShape();
+			}
+		}
+	}
+
 	private void GetPlayerInput () {
 		if ((Input.GetButton("MoveRight") && Time.time > timeToNextKeyLeftRight) || Input.GetButtonDown("MoveRight")) {
-			activeShape.MoveRight();
-			timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
-			if (!board.IsValidPosition(activeShape)) {
-				PlaySfxThroughGameController(soundManager.ErrorSound);
-				activeShape.MoveLeft();
-			} else {
-				PlaySfxThroughGameController(soundManager.MoveSound, 0.5f);
-			}
+			MoveRight();
 		} else if ((Input.GetButton("MoveLeft") && Time.time > timeToNextKeyLeftRight) || Input.GetButtonDown("MoveLeft")) {
-			activeShape.MoveLeft();
-			timeToNextKeyLeftRight = Time.time + keyRepeatRateLeftRight;
-			if (!board.IsValidPosition(activeShape)) {
-				PlaySfxThroughGameController(soundManager.ErrorSound);
-				activeShape.MoveRight();
-			} else {
-				PlaySfxThroughGameController(soundManager.MoveSound, 0.5f);
-			}
+			MoveLeft();
 		} else if (Input.GetButtonDown("Rotate")) { //&& Time.time > timeToNextKeyRotate) {
-			activeShape.RotateClockwise(isRotClockwise);
-			//timeToNextKeyRotate = Time.time + keyRepeatRateRotate;
-			if (!board.IsValidPosition(activeShape)) {
-				PlaySfxThroughGameController(soundManager.ErrorSound);
-				activeShape.RotateClockwise(!isRotClockwise);
-			} else {
-				PlaySfxThroughGameController(soundManager.MoveSound, 0.5f);
-			}
+			Rotate();
+		} else if ((Input.GetButton("MoveDown") && Time.time > timeToNextKeyDown) || Time.time > timeToDrop) {
+			MoveDown();
+		} else if (swipeDirection == Direction.right && Time.time > timeToNextKeyLeftRight || swipeEndDirection == Direction.right) {
+			MoveRight();
+			swipeDirection = Direction.none;
+			swipeEndDirection = Direction.none;
+		} else if (swipeDirection == Direction.left && Time.time > timeToNextKeyLeftRight || swipeEndDirection == Direction.left) {
+			MoveLeft();
+			swipeDirection = Direction.none;
+			swipeEndDirection = Direction.none;
+		} else if (swipeEndDirection == Direction.up) {
+			Rotate();
+			swipeEndDirection = Direction.none;
+		} else if (swipeDirection == Direction.down && Time.time > timeToNextKeyLeftRight) {
+			MoveDown();
+			swipeDirection = Direction.none;
 		} else if (Input.GetButtonDown("Hold")) {
 			Hold();
 		} else if (Input.GetButtonDown("ToggleRot")) {
 			ToggleRotDirection();
 		} else if (Input.GetButtonDown("TogglePause")) {
 			TogglePause();
-		}
-		if ((Input.GetButton("MoveDown") && Time.time > timeToNextKeyDown) || Time.time > timeToDrop) {
-			timeToDrop = Time.time + dropIntervalMod;
-			timeToNextKeyDown = Time.time + keyRepeatRateDown;
-			activeShape.MoveDown();
-			if (!board.IsValidPosition(activeShape)) {
-				if (board.IsOverLimit(activeShape)) {
-					GameOver();
-				} else {
-					LandShape();
-				}
-			}
 		}
 	}
 
@@ -254,14 +290,22 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void SwipeHandler (Vector2 swipeMovement) {
-		if (diagnosticText) {
-			diagnosticText.text = "Swipe Event Detected";
-		}	
+		swipeDirection = GetDirection(swipeMovement);
 	}
 
 	private void SwipeEndHandler (Vector2 swipeMovement) {
-		if (diagnosticText) {
-			diagnosticText.text = "";
-		}	
+		swipeEndDirection = GetDirection(swipeMovement);
+	}
+
+	private Direction GetDirection (Vector2 swipeMovement) {
+		Direction swipeDir = Direction.none;
+
+		if (Mathf.Abs(swipeMovement.x) > Mathf.Abs(swipeMovement.y)) {
+			swipeDir = (swipeMovement.x >= 0) ? Direction.right : Direction.left;
+		} else {
+			swipeDir = (swipeMovement.y >= 0) ? Direction.up : Direction.down;
+		}
+
+		return swipeDir;
 	}
 }

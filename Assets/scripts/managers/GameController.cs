@@ -21,6 +21,7 @@ public class GameController : MonoBehaviour {
 	private GameObject pausePanel;
 	[SerializeField]
 	private ParticlePlayer gameOverFx;
+
 	private Board board;
 	private Spawner spawner;
 	private Shape activeShape;
@@ -28,8 +29,13 @@ public class GameController : MonoBehaviour {
 	private ScoreManager scoreManager;
 	private Ghost ghost;
 	private Holder holder;
+	private Direction dragDirection = Direction.none;
 	private Direction swipeDirection = Direction.none;
-	private Direction swipeEndDirection = Direction.none;
+
+	[Range(0.05f, 1f)]
+	private float minTimeToDrag = 0.15f;
+	[Range(0.05f, 1f)]
+	private float minTimeToSwipe = 0.3f;
 
 	private bool isGameOver;
 	private float timeToDrop;
@@ -39,19 +45,24 @@ public class GameController : MonoBehaviour {
 	private float keyRepeatRateLeftRight = 0.1f;
 	private float timeToNextKeyDown;
 	private float keyRepeatRateDown = 0.05f;
+	private float timeToNextDrag;
+	private float timeToNextSwipe;
+	private bool didTap;
 	private bool isRotClockwise = true;
 	private bool isGamePaused;
 	// private float timeToNextKeyRotate;
 	// private float keyRepeatRateRotate = 0.1f;
 
 	private void OnEnable () {
-		TouchController.DragEvent += SwipeHandler;
-		TouchController.SwipeEvent += SwipeEndHandler;
+		TouchController.DragEvent += DragHandler;
+		TouchController.SwipeEvent += SwipeHandler;
+		TouchController.TapEvent += TapHandler;
 	}
 
 	private void OnDisable () {
-		TouchController.DragEvent -= SwipeHandler;
-		TouchController.SwipeEvent -= SwipeEndHandler;
+		TouchController.DragEvent -= DragHandler;
+		TouchController.SwipeEvent -= SwipeHandler;
+		TouchController.TapEvent -= TapHandler;
 	}
 	
 	private void Start () {
@@ -186,20 +197,24 @@ public class GameController : MonoBehaviour {
 			Rotate();
 		} else if ((Input.GetButton("MoveDown") && Time.time > timeToNextKeyDown) || Time.time > timeToDrop) {
 			MoveDown();
-		} else if (swipeDirection == Direction.right && Time.time > timeToNextKeyLeftRight || swipeEndDirection == Direction.right) {
+		} else if (
+			dragDirection == Direction.right && Time.time > timeToNextDrag || 
+			swipeDirection == Direction.right && Time.time > timeToNextSwipe) {
 			MoveRight();
-			swipeDirection = Direction.none;
-			swipeEndDirection = Direction.none;
-		} else if (swipeDirection == Direction.left && Time.time > timeToNextKeyLeftRight || swipeEndDirection == Direction.left) {
+			timeToNextDrag = Time.time + timeToNextDrag;
+			timeToNextSwipe = Time.time + timeToNextSwipe;
+		} else if (
+			dragDirection == Direction.left && Time.time > timeToNextDrag || 
+			swipeDirection == Direction.left && Time.time > timeToNextSwipe) {
 			MoveLeft();
-			swipeDirection = Direction.none;
-			swipeEndDirection = Direction.none;
-		} else if (swipeEndDirection == Direction.up) {
+			timeToNextDrag = Time.time + timeToNextDrag;
+			timeToNextSwipe = Time.time + timeToNextSwipe;
+		} else if ((swipeDirection == Direction.up && Time.time > timeToNextSwipe) || (didTap)) {
 			Rotate();
-			swipeEndDirection = Direction.none;
-		} else if (swipeDirection == Direction.down && Time.time > timeToNextKeyLeftRight) {
+			didTap = false;
+			timeToNextSwipe = Time.time + timeToNextSwipe;
+		} else if (dragDirection == Direction.down && Time.time > timeToNextDrag) {
 			MoveDown();
-			swipeDirection = Direction.none;
 		} else if (Input.GetButtonDown("Hold")) {
 			Hold();
 		} else if (Input.GetButtonDown("ToggleRot")) {
@@ -207,6 +222,9 @@ public class GameController : MonoBehaviour {
 		} else if (Input.GetButtonDown("TogglePause")) {
 			TogglePause();
 		}
+		dragDirection = Direction.none;
+		swipeDirection = Direction.none;
+		didTap = false;
 	}
 
 	private void LandShape () {
@@ -289,12 +307,16 @@ public class GameController : MonoBehaviour {
 		Assert.IsNotNull(holder);
 	}
 
+	private void DragHandler (Vector2 swipeMovement) {
+		dragDirection = GetDirection(swipeMovement);
+	}
+
 	private void SwipeHandler (Vector2 swipeMovement) {
 		swipeDirection = GetDirection(swipeMovement);
 	}
 
-	private void SwipeEndHandler (Vector2 swipeMovement) {
-		swipeEndDirection = GetDirection(swipeMovement);
+	private void TapHandler (Vector2 swipeMovement) {
+		didTap = true;
 	}
 
 	private Direction GetDirection (Vector2 swipeMovement) {

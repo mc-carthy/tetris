@@ -201,18 +201,18 @@ public class GameController : MonoBehaviour {
 			dragDirection == Direction.right && Time.time > timeToNextDrag || 
 			swipeDirection == Direction.right && Time.time > timeToNextSwipe) {
 			MoveRight();
-			timeToNextDrag = Time.time + timeToNextDrag;
-			timeToNextSwipe = Time.time + timeToNextSwipe;
+			timeToNextDrag = Time.time + minTimeToDrag;
+			timeToNextSwipe = Time.time + minTimeToSwipe;
 		} else if (
 			dragDirection == Direction.left && Time.time > timeToNextDrag || 
 			swipeDirection == Direction.left && Time.time > timeToNextSwipe) {
 			MoveLeft();
-			timeToNextDrag = Time.time + timeToNextDrag;
-			timeToNextSwipe = Time.time + timeToNextSwipe;
+			timeToNextDrag = Time.time + minTimeToDrag;
+			timeToNextSwipe = Time.time + minTimeToSwipe;
 		} else if ((swipeDirection == Direction.up && Time.time > timeToNextSwipe) || (didTap)) {
 			Rotate();
 			didTap = false;
-			timeToNextSwipe = Time.time + timeToNextSwipe;
+			timeToNextSwipe = Time.time + minTimeToSwipe;
 		} else if (dragDirection == Direction.down && Time.time > timeToNextDrag) {
 			MoveDown();
 		} else if (Input.GetButtonDown("Hold")) {

@@ -8,20 +8,45 @@ public class TouchController : MonoBehaviour {
 	public static event TouchScreenEventHandler SwipeEvent;
 	public static event TouchScreenEventHandler TapEvent;
 
+	[RangeAttribute(50, 150)]
+	private float minDragDistance = 50;	
+	public float MinDragDistance {
+		get {
+			return minDragDistance;
+		}
+		set {
+			minDragDistance = value;
+		}
+	}
+
+	[RangeAttribute(20, 250)]
+	private float minSwipeDistance = 50;
+	public float MinSwipeDistance {
+		get {
+			return minSwipeDistance;
+		}
+		set {
+			minSwipeDistance = value;
+		}
+	}
+
+	private bool isUsingDiagnostic;
+	public bool IsUsingDiagnostic {
+		get {
+			return isUsingDiagnostic;
+		}
+		set {
+			isUsingDiagnostic = value;
+		}
+	}
+
 	[SerializeField]
 	private Text diagnosticText1;
 	[SerializeField]
 	private Text diagnosticText2;
-	[SerializeField]
-	private bool isUsingDiagnostic;
-
 	private Vector2 touchMovement;
-	[RangeAttribute(50, 150)]
-	private int minDragDistance = 100;	
-	[RangeAttribute(50, 250)]
-	private int minSwipeDistance = 200;
 	private float tapTimeMax = 0;
-	private float tapTimeWindow = 0.1f;
+	private float tapTimeWindow = 0.2f;
 
 	private void Start () {
 		Diagnostic("", "");
@@ -46,10 +71,10 @@ public class TouchController : MonoBehaviour {
 				if (touchMovement.magnitude > minSwipeDistance) {
 					OnSwipeEnd();
 					Diagnostic("Swipe Detected", touchMovement.ToString() + " " + SwipeDiagnostic(touchMovement));
+				} else if (Time.time < tapTimeMax) {
+					OnTap();
+					Diagnostic("Tap Detected", touchMovement.ToString() + " " + SwipeDiagnostic(touchMovement));
 				}
-			} else if (Time.time < tapTimeMax) {
-				OnTap();
-				Diagnostic("Tap Detected", touchMovement.ToString() + " " + SwipeDiagnostic(touchMovement));
 			}
 		}
 	}

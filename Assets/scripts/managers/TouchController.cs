@@ -1,18 +1,23 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class TouchController : MonoBehaviour {
 
-	public delegate void TouchScreenEventHandler (Vector2 swipe);
-	
+	public delegate void TouchScreenEventHandler (Vector2 swipe);	
 	public static event TouchScreenEventHandler SwipeEvent;
+
+	[SerializeField]
+	private Text diagnosticText1;
+	[SerializeField]
+	private Text diagnosticText2;
+	[SerializeField]
+	private bool isUsingDiagnostic;
 
 	private Vector2 touchMovement;
 	private int minSwipeDistance = 20;
 
-	private void OnSwipe () {
-		if (SwipeEvent != null) {
-			SwipeEvent(touchMovement);
-		}
+	private void Start () {
+		Diagnostic("", "");
 	}
 
 	private void Update () {
@@ -21,14 +26,43 @@ public class TouchController : MonoBehaviour {
 
 			if (touch.phase == TouchPhase.Began) {
 				touchMovement = Vector2.zero;
+				Diagnostic("", "");
 			} else if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary) {
 				touchMovement += touch.deltaPosition;
 
 				if (touchMovement.magnitude > minSwipeDistance) {
 					OnSwipe();
+					Diagnostic("Swipe Detected", touchMovement.ToString() + " " + SwipeDiagnostic(touchMovement));
 				}
 			}
 		}
 	}
 
+	private void OnSwipe () {
+		if (SwipeEvent != null) {
+			SwipeEvent(touchMovement);
+			}
+		}
+
+	private void Diagnostic (string text1, string text2) {
+		diagnosticText1.gameObject.SetActive(isUsingDiagnostic);
+		diagnosticText2.gameObject.SetActive(isUsingDiagnostic);
+
+		if (diagnosticText1 && diagnosticText2) {
+			diagnosticText1.text = text1;
+			diagnosticText2.text = text2;
+		}
+	}
+
+	private string SwipeDiagnostic (Vector2 swipeMovement) {
+		string direction = "";
+
+		if (Mathf.Abs(swipeMovement.x) > Mathf.Abs(swipeMovement.y)) {
+			direction = (swipeMovement.x >= 0) ? "right" : "left";
+		} else {
+			direction = (swipeMovement.y >= 0) ? "up" : "down";
+		}
+
+		return direction;
+	}
 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class GameController : MonoBehaviour {
 
@@ -10,6 +11,8 @@ public class GameController : MonoBehaviour {
 	private IconToggle rotIconToggle;
 	[SerializeField]
 	private GameObject pausePanel;
+	[SerializeField]
+	private ParticlePlayer gameOverFx;
 	private Board board;
 	private Spawner spawner;
 	private Shape activeShape;
@@ -196,9 +199,21 @@ public class GameController : MonoBehaviour {
 	private void GameOver() {
 		activeShape.MoveUp();
 		isGameOver = true;
-		gameOverPanel.SetActive(true);
+
+		StartCoroutine(GameOverRoutine());
+
 		PlaySfxThroughGameController(soundManager.GameOverSound, 5.0f);
 		PlaySfxThroughGameController(soundManager.GameOverVocal, 5.0f);
+	}
+
+	private IEnumerator GameOverRoutine () {
+		if (gameOverFx) {
+			gameOverFx.Play();
+		}
+
+		yield return new WaitForSeconds(0.25f);
+
+		gameOverPanel.SetActive(true);
 	}
 
 	private void PlaySfxThroughGameController (AudioClip clip, float volMultiplier = 1.0f) {

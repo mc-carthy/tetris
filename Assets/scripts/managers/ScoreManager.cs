@@ -21,6 +21,8 @@ public class ScoreManager : MonoBehaviour {
 	}
 
 	[SerializeField]
+	private ParticlePlayer levelUpFx;
+	[SerializeField]
 	private Text linesText;
 	[SerializeField]
 	private Text levelText;
@@ -72,6 +74,9 @@ public class ScoreManager : MonoBehaviour {
 		level++;
 		lines = linesPerLevel * level;
 		isLevelingUp = true;
+		if (levelUpFx) {
+			levelUpFx.Play();
+		}
 	}
 
 	private void UpdateUIText () {

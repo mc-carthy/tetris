@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
+using System.Collections;
 
 public class Spawner : MonoBehaviour {
 
@@ -9,6 +10,8 @@ public class Spawner : MonoBehaviour {
 	private Transform[] queueTransforms;
 	[SerializeField]
 	private Shape[] queuedShapes = new Shape[3];
+	[SerializeField]
+	private ParticlePlayer spawnFx;
 	private float queueScale = 0.5f;
 
 	private void Start () {
@@ -21,7 +24,13 @@ public class Spawner : MonoBehaviour {
 	public Shape SpawnShape () {
 		Shape newShape = GetQueuedShape();
 		newShape.transform.position = transform.position;
-		newShape.transform.localScale = Vector3.one;
+		
+		//newShape.transform.localScale = Vector3.one;
+		StartCoroutine(GrowShape(newShape, transform.position, 0.25f));
+
+		if (spawnFx) {
+			spawnFx.Play();
+		}
 		if (newShape) {
 			return newShape;
 		} else {
@@ -67,5 +76,20 @@ public class Spawner : MonoBehaviour {
 		FillQueue();
 
 		return firstShape;
+	}
+
+	private IEnumerator GrowShape(Shape shape, Vector3 position, float growTime = 0.5f) {
+		float size = 0f;
+		growTime = Mathf.Clamp(growTime, 0.1f, 2f);
+
+		float sizeDelta = Time.deltaTime / growTime;
+		while (size < 1f) {
+			shape.transform.localScale = Vector3.one * size;
+			size += sizeDelta;
+			shape.transform.position = position;
+			yield return null;
+		}
+
+		shape.transform.localScale = Vector3.one;
 	}
 }

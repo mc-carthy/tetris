@@ -19,6 +19,7 @@ public class Ghost : MonoBehaviour {
 		} else {
 			ghostShape.transform.position = origShape.transform.position;
 			ghostShape.transform.rotation = origShape.transform.rotation;
+			ghostShape.transform.localScale = Vector3.one;
 		}
 		hasHitBottom = false;
 

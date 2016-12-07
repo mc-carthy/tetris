@@ -5,6 +5,7 @@ public class TouchController : MonoBehaviour {
 
 	public delegate void TouchScreenEventHandler (Vector2 swipe);	
 	public static event TouchScreenEventHandler SwipeEvent;
+	public static event TouchScreenEventHandler SwipeEndEvent;
 
 	[SerializeField]
 	private Text diagnosticText1;
@@ -34,6 +35,8 @@ public class TouchController : MonoBehaviour {
 					OnSwipe();
 					Diagnostic("Swipe Detected", touchMovement.ToString() + " " + SwipeDiagnostic(touchMovement));
 				}
+			} else if (touch.phase == TouchPhase.Ended) {
+				OnSwipeEnd();
 			}
 		}
 	}
@@ -41,8 +44,14 @@ public class TouchController : MonoBehaviour {
 	private void OnSwipe () {
 		if (SwipeEvent != null) {
 			SwipeEvent(touchMovement);
-			}
 		}
+	}
+
+	private void OnSwipeEnd () {
+		if (SwipeEndEvent != null) {
+			SwipeEndEvent(touchMovement);
+		}	
+	}
 
 	private void Diagnostic (string text1, string text2) {
 		diagnosticText1.gameObject.SetActive(isUsingDiagnostic);

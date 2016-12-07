@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using System.Collections;
 
 public class GameController : MonoBehaviour {
@@ -13,6 +14,8 @@ public class GameController : MonoBehaviour {
 	private GameObject pausePanel;
 	[SerializeField]
 	private ParticlePlayer gameOverFx;
+	[SerializeField]
+	private Text diagnosticText;
 	private Board board;
 	private Spawner spawner;
 	private Shape activeShape;
@@ -33,6 +36,16 @@ public class GameController : MonoBehaviour {
 	private bool isGamePaused;
 	// private float timeToNextKeyRotate;
 	// private float keyRepeatRateRotate = 0.1f;
+
+	private void OnEnable () {
+		TouchController.SwipeEvent += SwipeHandler;
+		TouchController.SwipeEndEvent += SwipeEndHandler;
+	}
+
+	private void OnDisable () {
+		TouchController.SwipeEvent -= SwipeHandler;
+		TouchController.SwipeEndEvent -= SwipeEndHandler;
+	}
 	
 	private void Start () {
 		gameOverPanel.SetActive(false);
@@ -238,5 +251,17 @@ public class GameController : MonoBehaviour {
 		Assert.IsNotNull(soundManager);
 		Assert.IsNotNull(scoreManager);
 		Assert.IsNotNull(holder);
+	}
+
+	private void SwipeHandler (Vector2 swipeMovement) {
+		if (diagnosticText) {
+			diagnosticText.text = "Swipe Event Detected";
+		}	
+	}
+
+	private void SwipeEndHandler (Vector2 swipeMovement) {
+		if (diagnosticText) {
+			diagnosticText.text = "";
+		}	
 	}
 }

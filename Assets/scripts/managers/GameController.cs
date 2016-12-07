@@ -45,13 +45,13 @@ public class GameController : MonoBehaviour {
 	// private float keyRepeatRateRotate = 0.1f;
 
 	private void OnEnable () {
-		TouchController.SwipeEvent += SwipeHandler;
-		TouchController.SwipeEndEvent += SwipeEndHandler;
+		TouchController.DragEvent += SwipeHandler;
+		TouchController.SwipeEvent += SwipeEndHandler;
 	}
 
 	private void OnDisable () {
-		TouchController.SwipeEvent -= SwipeHandler;
-		TouchController.SwipeEndEvent -= SwipeEndHandler;
+		TouchController.DragEvent -= SwipeHandler;
+		TouchController.SwipeEvent -= SwipeEndHandler;
 	}
 	
 	private void Start () {

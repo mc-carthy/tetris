@@ -4,8 +4,9 @@ using UnityEngine.UI;
 public class TouchController : MonoBehaviour {
 
 	public delegate void TouchScreenEventHandler (Vector2 swipe);	
+	public static event TouchScreenEventHandler DragEvent;
 	public static event TouchScreenEventHandler SwipeEvent;
-	public static event TouchScreenEventHandler SwipeEndEvent;
+	public static event TouchScreenEventHandler TapEvent;
 
 	[SerializeField]
 	private Text diagnosticText1;
@@ -15,7 +16,12 @@ public class TouchController : MonoBehaviour {
 	private bool isUsingDiagnostic;
 
 	private Vector2 touchMovement;
-	private int minSwipeDistance = 20;
+	[RangeAttribute(50, 150)]
+	private int minDragDistance = 100;	
+	[RangeAttribute(50, 250)]
+	private int minSwipeDistance = 200;
+	private float tapTimeMax = 0;
+	private float tapTimeWindow = 0.1f;
 
 	private void Start () {
 		Diagnostic("", "");
@@ -27,30 +33,43 @@ public class TouchController : MonoBehaviour {
 
 			if (touch.phase == TouchPhase.Began) {
 				touchMovement = Vector2.zero;
+				tapTimeMax = Time.time + tapTimeWindow;
 				Diagnostic("", "");
 			} else if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary) {
 				touchMovement += touch.deltaPosition;
 
-				if (touchMovement.magnitude > minSwipeDistance) {
-					OnSwipe();
-					Diagnostic("Swipe Detected", touchMovement.ToString() + " " + SwipeDiagnostic(touchMovement));
+				if (touchMovement.magnitude > minDragDistance) {
+					OnDrag();
+					Diagnostic("Drag Detected", touchMovement.ToString() + " " + SwipeDiagnostic(touchMovement));
 				}
 			} else if (touch.phase == TouchPhase.Ended) {
-				OnSwipeEnd();
+				if (touchMovement.magnitude > minSwipeDistance) {
+					OnSwipeEnd();
+					Diagnostic("Swipe Detected", touchMovement.ToString() + " " + SwipeDiagnostic(touchMovement));
+				}
+			} else if (Time.time < tapTimeMax) {
+				OnTap();
+				Diagnostic("Tap Detected", touchMovement.ToString() + " " + SwipeDiagnostic(touchMovement));
 			}
 		}
 	}
 
-	private void OnSwipe () {
-		if (SwipeEvent != null) {
-			SwipeEvent(touchMovement);
+	private void OnDrag () {
+		if (DragEvent != null) {
+			DragEvent(touchMovement);
 		}
 	}
 
 	private void OnSwipeEnd () {
-		if (SwipeEndEvent != null) {
-			SwipeEndEvent(touchMovement);
+		if (SwipeEvent != null) {
+			SwipeEvent(touchMovement);
 		}	
+	}
+
+	private void OnTap () {
+		if (TapEvent != null) {
+			TapEvent(touchMovement);
+		}
 	}
 
 	private void Diagnostic (string text1, string text2) {

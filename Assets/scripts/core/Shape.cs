@@ -3,8 +3,6 @@
 public class Shape : MonoBehaviour {
 
 	[SerializeField]
-	private bool isRotatable;
-	[SerializeField]
 	private Vector3 queueOffset;
 	public Vector3 QueueOffset {
 		get {
@@ -12,8 +10,16 @@ public class Shape : MonoBehaviour {
 		}
 	}
 
-	private void Start () {
+	[SerializeField]
+	private bool isRotatable;
+	[SerializeField]
+	private string glowSquareFxTag;
+	private GameObject[] glowSquareFx;
 
+	private void Start () {
+		if (glowSquareFxTag != null && glowSquareFxTag != "") {
+			glowSquareFx = GameObject.FindGameObjectsWithTag(glowSquareFxTag);
+		}
 	}
 
 	private void Move (Vector3 moveDirection) {
@@ -54,5 +60,20 @@ public class Shape : MonoBehaviour {
 		} else {
 			RotateLeft();
 		}
-	} 
+	}
+
+	public void LandShapeFx () {
+		int i = 0;
+
+		foreach (Transform child in gameObject.transform) {
+			if (glowSquareFx[i]) {
+				glowSquareFx[i].transform.position = child.position - Vector3.forward;
+				ParticlePlayer particlePlayer = glowSquareFx[i].GetComponent<ParticlePlayer>();
+				if (particlePlayer) {
+					particlePlayer.Play();
+				}
+				i++;
+			}
+		}
+	}
 }

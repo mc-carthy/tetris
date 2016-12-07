@@ -7,6 +7,7 @@ public class Spawner : MonoBehaviour {
 	private Shape[] shapePrefabs;
 	[SerializeField]
 	private Transform[] queueTransforms;
+	[SerializeField]
 	private Shape[] queuedShapes = new Shape[3];
 	private float queueScale = 0.5f;
 

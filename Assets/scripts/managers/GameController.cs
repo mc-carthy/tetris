@@ -164,6 +164,8 @@ public class GameController : MonoBehaviour {
 		activeShape.MoveUp();
 		board.StoreShapeInGrid(activeShape);
 
+		activeShape.LandShapeFx();
+
 		if (ghost) {
 			ghost.Reset();
 		}
